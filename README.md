@@ -2,8 +2,6 @@
 
 This is a docker base project for php projects
 
-<br />
-
 ## Features
 
 - Nginx stable-alpine
@@ -11,8 +9,6 @@ This is a docker base project for php projects
 - MySQL 5.7
 - Phpmyadmin
 - Xdebug v3.1.4
-
-<br />
 
 ## Environment Variables
 
@@ -31,8 +27,6 @@ To run this project, you will need to add the following environment variables to
 <br />
 
 > In case of you use linux, run `docker inspect -f {{range.NetworkSettings.Networks}}{{.Gateway}}{{end}} dc_php`, replace `host.docker.internal` with the result in the `.env` file
-
-<br />
 
 ## Installation
 
@@ -57,8 +51,6 @@ Open `http://localhost` on your browser
 Open `http://localhost:8080` for `Phpmyadmin`
 
 Enjoy :)
-
-<br />
 
 ## Author
 
