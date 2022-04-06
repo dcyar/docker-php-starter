@@ -1,0 +1,72 @@
+version: '3.7'
+
+services:
+  nginx:
+    image: nginx:stable-alpine
+    container_name: dc_nginx
+    volumes:
+      - ./app:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./docker/logs/:/var/log/nginx
+    depends_on:
+      - php
+      - mysql
+    ports:
+      - '80:80'
+    networks:
+      - red
+
+  php:
+    image: php:7.4-fpm
+    container_name: dc_php
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./app/:/var/www/html
+      - ./docker/php/conf.d/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+      - ./docker/php/conf.d/error_reporting.ini:/usr/local/etc/php/conf.d/error_reporting.ini
+    ports:
+      - '9000:9000'
+    environment:
+      XDEBUG_MODE: '${XDEBUG_MODE:-off}'
+      XDEBUG_CONFIG: '${XDEBUG_CONFIG:-client_host=host.docker.internal}'
+    networks:
+      - red
+
+  mysql:
+    image: mysql:5.7
+    container_name: dc_mysql
+    restart: always
+    tty: true
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ./docker/mysql/:/var/lib/mysql
+    networks:
+      - red
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: dc_phpmyadmin
+    links:
+      - mysql
+    ports:
+      - '8080:80'
+    depends_on:
+      - mysql
+    environment:
+      PMA_ARBITRARY: 1
+      PMA_HOST: mysql
+      PMA_USER: ${DB_USER}
+      PMA_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - red
+
+networks:
+  red:
+    driver: bridge
